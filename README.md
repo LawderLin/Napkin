@@ -18,6 +18,13 @@ A browser-based, no login required note taking tool, with functions like auto-ex
 - **Database**: PostgreSQL
 - **Markdown**: Marked.js for rendering
 
+## Documentation
+
+- **[Quick Start Guide](QUICKSTART.md)** - Get up and running in 5 minutes
+- **[Demo Guide](DEMO.md)** - Usage examples and features demonstration
+- **[Deployment Guide](DEPLOYMENT.md)** - Production deployment instructions
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+
 ## Quick Start with Docker
 
 The easiest way to run Napkin is using Docker Compose:

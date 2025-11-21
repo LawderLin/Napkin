@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.env
+
+# Node
+node_modules/
+npm-debug.log*
+dist/
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+CONTRIBUTING.md
+DEMO.md
+
+# Tests
+backend/test_*.py
+frontend/tests/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
