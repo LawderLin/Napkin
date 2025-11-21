@@ -128,7 +128,24 @@ pip list --outdated
 pip install --upgrade -r requirements.txt
 ```
 
-#### 7. Enable Security Headers
+#### 7. Disable Debug Mode in Production
+
+**CRITICAL**: Ensure Flask debug mode is disabled:
+
+```bash
+# In .env file
+FLASK_DEBUG=false
+```
+
+**Why?** Debug mode exposes:
+- Full stack traces with source code
+- Interactive debugger (allows arbitrary code execution)
+- Internal application state
+- Configuration details
+
+**Note**: The default code now reads from `FLASK_DEBUG` environment variable. Always use a production WSGI server (gunicorn) instead of the built-in Flask server.
+
+#### 8. Enable Security Headers
 
 Add security headers to responses:
 
@@ -142,7 +159,7 @@ def add_security_headers(response):
     return response
 ```
 
-#### 8. Database Backups
+#### 9. Database Backups
 
 Implement regular automated backups:
 

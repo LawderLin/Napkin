@@ -231,4 +231,7 @@ def check_note(note_id):
 
 if __name__ == '__main__':
     init_db()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Debug mode should only be enabled for development
+    # In production, use a WSGI server like gunicorn instead
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)

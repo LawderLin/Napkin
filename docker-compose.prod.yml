@@ -33,6 +33,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
       DB_HOST: postgres
       DB_PORT: 5432
+      # SECURITY: Disable debug mode in production
+      FLASK_DEBUG: "false"
       # Use bcrypt version for production
     ports:
       - "5000:5000"
