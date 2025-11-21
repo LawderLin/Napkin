@@ -1,0 +1,23 @@
+{
+  "name": "napkin-frontend",
+  "version": "1.0.0",
+  "description": "Napkin - Browser-based note taking tool",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4",
+    "axios": "^1.5.0",
+    "marked": "^9.0.0"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^5.0.8",
+    "@vue/compiler-sfc": "^3.3.4",
+    "vue-loader": "^17.2.2",
+    "webpack": "^5.88.2"
+  }
+}

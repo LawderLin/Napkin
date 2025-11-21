@@ -1,0 +1,72 @@
+version: '3.8'
+
+# Production Docker Compose Configuration
+# Usage: docker compose -f docker-compose.prod.yml up -d
+#
+# IMPORTANT: Update passwords and secrets before deploying!
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      # SECURITY: Change these values in production!
+      POSTGRES_DB: napkin
+      POSTGRES_USER: napkin_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U napkin_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Note: Port not exposed for security
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DB_NAME: napkin
+      DB_USER: napkin_user
+      DB_PASSWORD: ${DB_PASSWORD:-CHANGE_ME_IN_PRODUCTION}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      # SECURITY: Disable debug mode in production
+      FLASK_DEBUG: "false"
+      # Use bcrypt version for production
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    # Use production-ready WSGI server
+    command: gunicorn -w 4 -b 0.0.0.0:5000 app:app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        - API_URL=${API_URL:-http://localhost:5000}
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+# Production deployment checklist:
+# [ ] Change DB_PASSWORD to a strong password
+# [ ] Set DB_PASSWORD environment variable or use .env file
+# [ ] Configure HTTPS/SSL certificates (use nginx-proxy or traefik)
+# [ ] Set up regular database backups
+# [ ] Configure log aggregation
+# [ ] Set up monitoring and alerts
+# [ ] Review and apply security headers
+# [ ] Implement rate limiting
+# [ ] Consider using bcrypt version (app_bcrypt.py)
