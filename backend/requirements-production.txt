@@ -1,0 +1,14 @@
+# Production requirements with enhanced security
+# Use: pip install -r requirements-production.txt
+
+Flask==2.3.3
+flask-cors==4.0.0
+psycopg2-binary==2.9.7
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Production-grade password hashing (optional but recommended)
+bcrypt==4.0.1
+
+# Production WSGI server
+gunicorn==21.2.0

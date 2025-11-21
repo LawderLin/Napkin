@@ -24,6 +24,7 @@ A browser-based, no login required note taking tool, with functions like auto-ex
 - **[Demo Guide](DEMO.md)** - Usage examples and features demonstration
 - **[Deployment Guide](DEPLOYMENT.md)** - Production deployment instructions
 - **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+- **[Security Policy](SECURITY.md)** - Security features and recommendations
 
 ## Quick Start with Docker
 
@@ -191,10 +192,32 @@ CREATE TABLE notes (
 ## Security Features
 
 - **Password Security**: Passwords are hashed using SHA256 with random salts (protects against rainbow table attacks)
+  - Note: For production systems with high security requirements, consider using bcrypt, scrypt, or Argon2
 - **Auto-Expiry**: Notes are automatically deleted when expired
 - **Secure IDs**: Random URL-safe IDs generated for each note
 - **CORS Protection**: CORS enabled on the backend for secure cross-origin requests
 - **No Port Exposure**: PostgreSQL is not exposed outside Docker network
+
+### Security Recommendations for Production
+
+For production deployments requiring enhanced security:
+
+1. **Password Hashing**: Replace SHA256 with bcrypt, scrypt, or Argon2:
+```python
+# Using bcrypt (add to requirements.txt: bcrypt==4.0.1)
+import bcrypt
+
+def hash_password(password):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+def verify_password(password, stored_hash):
+    return bcrypt.checkpw(password.encode(), stored_hash.encode())
+```
+
+2. **HTTPS**: Always use SSL/TLS certificates in production
+3. **Rate Limiting**: Implement rate limiting to prevent abuse
+4. **Input Validation**: Add additional input validation and sanitization
+5. **Secrets Management**: Use environment variables or secret managers for credentials
 
 ## License
 

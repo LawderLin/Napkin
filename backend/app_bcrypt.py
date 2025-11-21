@@ -1,12 +1,19 @@
+"""
+Production-ready version of Napkin backend with bcrypt password hashing
+
+To use this version:
+1. Install bcrypt: pip install bcrypt==4.0.1
+2. Run with: python app_bcrypt.py
+"""
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
-import hashlib
 import secrets
 from datetime import datetime, timedelta
-import json
+import bcrypt
 
 app = Flask(__name__)
 CORS(app)
@@ -44,22 +51,16 @@ def init_db():
     cur.close()
     conn.close()
 
-def hash_password(password, salt=None):
-    """Hash a password using SHA256 with salt"""
-    if salt is None:
-        salt = secrets.token_hex(16)
-    password_hash = hashlib.sha256((password + salt).encode()).hexdigest()
-    return f"{salt}:{password_hash}"
+def hash_password(password):
+    """Hash a password using bcrypt"""
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 def verify_password(password, stored_hash):
-    """Verify a password against a stored hash"""
-    if not stored_hash or ':' not in stored_hash:
+    """Verify a password against a stored bcrypt hash"""
+    try:
+        return bcrypt.checkpw(password.encode(), stored_hash.encode())
+    except Exception:
         return False
-    parts = stored_hash.split(':', 1)
-    if len(parts) != 2:
-        return False
-    salt, password_hash = parts
-    return hash_password(password, salt) == stored_hash
 
 def generate_note_id():
     """Generate a random note ID"""
@@ -84,7 +85,7 @@ def create_note():
         password = data.get('password')
         expire_hours = data.get('expire_hours')
         
-        # Hash password with salt if provided
+        # Hash password with bcrypt if provided
         password_hash = hash_password(password) if password else None
         
         # Calculate expiry time

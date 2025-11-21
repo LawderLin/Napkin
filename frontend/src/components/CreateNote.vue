@@ -136,15 +136,24 @@ export default {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(this.shareLink)
           .then(() => alert('Link copied to clipboard!'))
-          .catch(() => {
-            // Fallback for older browsers
-            document.execCommand('copy')
-            alert('Link copied to clipboard!')
-          })
+          .catch(() => this.fallbackCopy(input))
       } else {
-        // Fallback for browsers without Clipboard API
-        document.execCommand('copy')
-        alert('Link copied to clipboard!')
+        this.fallbackCopy(input)
+      }
+    },
+    
+    fallbackCopy(input) {
+      // Fallback for older browsers
+      try {
+        input.select()
+        const success = document.execCommand('copy')
+        if (success) {
+          alert('Link copied to clipboard!')
+        } else {
+          alert('Failed to copy. Please copy the link manually.')
+        }
+      } catch (err) {
+        alert('Failed to copy. Please copy the link manually.')
       }
     },
     
