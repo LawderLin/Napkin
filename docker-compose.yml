@@ -6,6 +6,8 @@ services:
     environment:
       POSTGRES_DB: napkin
       POSTGRES_USER: postgres
+      # WARNING: Change this password for production!
+      # Use docker-compose.prod.yml for production deployments
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
