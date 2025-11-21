@@ -34,8 +34,9 @@ The easiest way to run Napkin is using Docker Compose:
 git clone https://github.com/LawderLin/Napkin.git
 cd Napkin
 
-# Start all services
-docker-compose up -d
+# Start all services (use 'docker compose' or 'docker-compose' depending on your version)
+docker compose up -d
+# or: docker-compose up -d
 
 # Access the application
 # Frontend: http://localhost:8080
@@ -180,7 +181,7 @@ DB_PORT=5432
 CREATE TABLE notes (
     id VARCHAR(32) PRIMARY KEY,
     content TEXT NOT NULL,
-    password_hash VARCHAR(64),
+    password_hash VARCHAR(128),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     expires_at TIMESTAMP,
     views INTEGER DEFAULT 0
@@ -189,10 +190,11 @@ CREATE TABLE notes (
 
 ## Security Features
 
-- Passwords are hashed using SHA256 before storage
-- Expired notes are automatically deleted when accessed
-- Random URL-safe IDs are generated for each note
-- CORS protection enabled on the backend
+- **Password Security**: Passwords are hashed using SHA256 with random salts (protects against rainbow table attacks)
+- **Auto-Expiry**: Notes are automatically deleted when expired
+- **Secure IDs**: Random URL-safe IDs generated for each note
+- **CORS Protection**: CORS enabled on the backend for secure cross-origin requests
+- **No Port Exposure**: PostgreSQL is not exposed outside Docker network
 
 ## License
 

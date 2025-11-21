@@ -28,7 +28,7 @@ def init_database():
             CREATE TABLE IF NOT EXISTS notes (
                 id VARCHAR(32) PRIMARY KEY,
                 content TEXT NOT NULL,
-                password_hash VARCHAR(64),
+                password_hash VARCHAR(128),
                 created_at TIMESTAMP NOT NULL DEFAULT NOW(),
                 expires_at TIMESTAMP,
                 views INTEGER DEFAULT 0

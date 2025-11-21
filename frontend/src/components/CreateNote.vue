@@ -129,9 +129,23 @@ export default {
     },
     
     copyShareLink() {
-      this.$refs.shareLinkInput.select()
-      document.execCommand('copy')
-      alert('Link copied to clipboard!')
+      const input = this.$refs.shareLinkInput
+      input.select()
+      
+      // Use modern Clipboard API with fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(this.shareLink)
+          .then(() => alert('Link copied to clipboard!'))
+          .catch(() => {
+            // Fallback for older browsers
+            document.execCommand('copy')
+            alert('Link copied to clipboard!')
+          })
+      } else {
+        // Fallback for browsers without Clipboard API
+        document.execCommand('copy')
+        alert('Link copied to clipboard!')
+      }
     },
     
     clearForm() {

@@ -10,20 +10,33 @@ echo "======================"
 echo ""
 
 # Check if Docker is installed
-if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; then
-    echo "✓ Docker and Docker Compose are installed"
-    echo ""
-    echo "Starting Napkin with Docker..."
-    echo ""
-    docker-compose up -d
-    echo ""
-    echo "✅ Napkin is running!"
-    echo ""
-    echo "Frontend: http://localhost:8080"
-    echo "Backend API: http://localhost:5000"
-    echo ""
-    echo "To stop: docker-compose down"
-    exit 0
+if command -v docker &> /dev/null; then
+    # Check for docker compose (new) or docker-compose (legacy)
+    if docker compose version &> /dev/null; then
+        DOCKER_COMPOSE="docker compose"
+    elif command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE="docker-compose"
+    else
+        echo "Docker is installed but Docker Compose is not found."
+        echo "Please install Docker Compose."
+        DOCKER_COMPOSE=""
+    fi
+    
+    if [ -n "$DOCKER_COMPOSE" ]; then
+        echo "✓ Docker and Docker Compose are installed"
+        echo ""
+        echo "Starting Napkin with Docker..."
+        echo ""
+        $DOCKER_COMPOSE up -d
+        echo ""
+        echo "✅ Napkin is running!"
+        echo ""
+        echo "Frontend: http://localhost:8080"
+        echo "Backend API: http://localhost:5000"
+        echo ""
+        echo "To stop: $DOCKER_COMPOSE down"
+        exit 0
+    fi
 fi
 
 echo "Docker not found. Setting up manually..."

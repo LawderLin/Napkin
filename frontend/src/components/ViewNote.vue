@@ -157,17 +157,31 @@ export default {
     },
     
     copyContent() {
-      navigator.clipboard.writeText(this.noteContent)
-        .then(() => alert('Content copied to clipboard!'))
-        .catch(() => {
-          const textarea = document.createElement('textarea')
-          textarea.value = this.noteContent
-          document.body.appendChild(textarea)
-          textarea.select()
-          document.execCommand('copy')
-          document.body.removeChild(textarea)
-          alert('Content copied to clipboard!')
-        })
+      // Use modern Clipboard API with fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(this.noteContent)
+          .then(() => alert('Content copied to clipboard!'))
+          .catch(() => this.fallbackCopyContent())
+      } else {
+        this.fallbackCopyContent()
+      }
+    },
+    
+    fallbackCopyContent() {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea')
+      textarea.value = this.noteContent
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      try {
+        document.execCommand('copy')
+        alert('Content copied to clipboard!')
+      } catch (err) {
+        alert('Failed to copy content. Please copy manually.')
+      }
+      document.body.removeChild(textarea)
     },
     
     goHome() {

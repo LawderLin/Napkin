@@ -8,14 +8,23 @@ from datetime import datetime, timedelta
 
 # Test utility functions
 def test_hash_password():
-    """Test password hashing"""
+    """Test password hashing with salt"""
     password = "test123"
-    hash1 = hashlib.sha256(password.encode()).hexdigest()
-    hash2 = hashlib.sha256(password.encode()).hexdigest()
     
-    assert hash1 == hash2, "Same password should produce same hash"
+    # Test with random salt
+    hash1 = hashlib.sha256((password + secrets.token_hex(16)).encode()).hexdigest()
+    hash2 = hashlib.sha256((password + secrets.token_hex(16)).encode()).hexdigest()
+    
+    assert hash1 != hash2, "Different salts should produce different hashes"
     assert len(hash1) == 64, "SHA256 hash should be 64 characters"
-    print("✓ Password hashing works correctly")
+    
+    # Test with same salt
+    salt = secrets.token_hex(16)
+    hash3 = hashlib.sha256((password + salt).encode()).hexdigest()
+    hash4 = hashlib.sha256((password + salt).encode()).hexdigest()
+    assert hash3 == hash4, "Same password and salt should produce same hash"
+    
+    print("✓ Password hashing with salt works correctly")
 
 def test_generate_note_id():
     """Test note ID generation"""
@@ -37,21 +46,23 @@ def test_expiry_calculation():
     print("✓ Expiry calculation works correctly")
 
 def test_password_validation():
-    """Test password validation logic"""
+    """Test password validation logic with salt"""
     password = "secret123"
-    hashed = hashlib.sha256(password.encode()).hexdigest()
+    salt = secrets.token_hex(16)
+    stored_hash = f"{salt}:{hashlib.sha256((password + salt).encode()).hexdigest()}"
     
     # Correct password
     user_input = "secret123"
-    user_hash = hashlib.sha256(user_input.encode()).hexdigest()
-    assert user_hash == hashed, "Correct password should match"
+    salt_from_stored = stored_hash.split(':')[0]
+    user_hash = f"{salt_from_stored}:{hashlib.sha256((user_input + salt_from_stored).encode()).hexdigest()}"
+    assert user_hash == stored_hash, "Correct password should match"
     
     # Wrong password
     wrong_input = "wrong_password"
-    wrong_hash = hashlib.sha256(wrong_input.encode()).hexdigest()
-    assert wrong_hash != hashed, "Wrong password should not match"
+    wrong_hash = f"{salt_from_stored}:{hashlib.sha256((wrong_input + salt_from_stored).encode()).hexdigest()}"
+    assert wrong_hash != stored_hash, "Wrong password should not match"
     
-    print("✓ Password validation works correctly")
+    print("✓ Password validation with salt works correctly")
 
 if __name__ == '__main__':
     print("Running Napkin backend tests...\n")

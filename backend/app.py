@@ -33,7 +33,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS notes (
             id VARCHAR(32) PRIMARY KEY,
             content TEXT NOT NULL,
-            password_hash VARCHAR(64),
+            password_hash VARCHAR(128),
             created_at TIMESTAMP NOT NULL DEFAULT NOW(),
             expires_at TIMESTAMP,
             views INTEGER DEFAULT 0
@@ -44,9 +44,19 @@ def init_db():
     cur.close()
     conn.close()
 
-def hash_password(password):
-    """Hash a password using SHA256"""
-    return hashlib.sha256(password.encode()).hexdigest()
+def hash_password(password, salt=None):
+    """Hash a password using SHA256 with salt"""
+    if salt is None:
+        salt = secrets.token_hex(16)
+    password_hash = hashlib.sha256((password + salt).encode()).hexdigest()
+    return f"{salt}:{password_hash}"
+
+def verify_password(password, stored_hash):
+    """Verify a password against a stored hash"""
+    if not stored_hash or ':' not in stored_hash:
+        return False
+    salt, password_hash = stored_hash.split(':', 1)
+    return hash_password(password, salt) == stored_hash
 
 def generate_note_id():
     """Generate a random note ID"""
@@ -71,7 +81,7 @@ def create_note():
         password = data.get('password')
         expire_hours = data.get('expire_hours')
         
-        # Hash password if provided
+        # Hash password with salt if provided
         password_hash = hash_password(password) if password else None
         
         # Calculate expiry time
@@ -135,7 +145,7 @@ def get_note(note_id):
         
         # Check password if required
         if note['password_hash']:
-            if not password or hash_password(password) != note['password_hash']:
+            if not password or not verify_password(password, note['password_hash']):
                 cur.close()
                 conn.close()
                 return jsonify({'error': 'Invalid password', 'requires_password': True}), 403
